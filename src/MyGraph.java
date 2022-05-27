@@ -3,38 +3,47 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class MyGraph <Vertex>{
-    private boolean bidirectional;
+public class MyGraph<Vertex> {
     private Map<Vertex, List<Vertex>> map;
-    public MyGraph(){
-        this(false);
+    private boolean undirected;
+
+    public MyGraph(){this(true);}
+    public MyGraph(boolean undirected){
+        this.undirected = undirected;
+        map=new HashMap<>();
     }
-    public MyGraph(boolean bidirectional){
-        this.bidirectional = bidirectional;
-        map = new HashMap<>();
-    }
+
     public void addVertex(Vertex vertex){
-        map.put(vertex, new LinkedList<>());
+        map.put(vertex,new LinkedList<>());
     }
-    public void addEdge(Vertex a, Vertex b){
-        if(!hasVertex(a))
-            addVertex(a);
-        if(!hasVertex(b))
-            addVertex(b);
-        if(hasEdge(a,b) || a.equals(b)){
-            return;
+    public void addEdge(Vertex source,Vertex dest){
+        if(!hasVertex(source)) addVertex(source);
+        if(!hasVertex(dest)) addVertex(dest);
+
+        if(hasEdge(source, dest) || source.equals(dest)) return;
+
+        map.get(source).add(dest);
+
+        if(undirected) map.get(dest).add(source);
+    }
+    public boolean hasVertex(Vertex vertex){
+        return map.containsKey(vertex);
+    }
+    public boolean hasEdge(Vertex source,Vertex dest){
+        List<Vertex> list = map.get(source);
+        return list != null && list.contains(dest);
+    }
+    public int getVerticesCount(){return map.size();}
+    public int getEdgesCount(){
+        int count=0;
+        for(Vertex v : map.keySet()){
+            count+=map.get(v).size();
         }
-        map.get(a).add(b);
-
-        if(bidirectional)
-            map.get(b).add(a);
+        if(undirected) count/=2;
+        return count;
     }
-    public boolean hasVertex(Vertex a){
-        return map.containsKey(a);
+    public List<Vertex> adjacencyList(Vertex vertex){
+        if(!hasVertex(vertex)) return null;
+        return map.get(vertex);
     }
-    public boolean hasEdge(Vertex a,Vertex b){
-        List<Vertex> list = map.get(a);
-        return list != null && list.contains(b);
-    }
-
 }
